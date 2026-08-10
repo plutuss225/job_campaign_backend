@@ -2,7 +2,7 @@
   "name": "job_campaign_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon --ignore auth_info_baileys/ server.js",
