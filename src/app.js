@@ -8,6 +8,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./swagger');
@@ -32,6 +33,7 @@ app.use('/api/admins', adminRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // Health check endpoint
 app.get('/', (req, res) => {

@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'job_campaign_documents',
-    allowed_formats: ['pdf', 'doc', 'docx', 'png', 'jpg', 'jpeg'],
+    allowed_formats: ['pdf', 'doc', 'docx', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'],
     // resource_type: 'raw' is needed for non-image files like pdf/doc in some cases,
     // but Cloudinary v2 auto-detects 'auto' if specified.
     resource_type: 'auto'
