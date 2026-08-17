@@ -31,14 +31,23 @@ async function connectToWhatsApp() {
     }
 
     if (connection === 'close') {
-      const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+      const statusCode = lastDisconnect.error?.output?.statusCode;
+      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
       console.log('WhatsApp connection closed due to', lastDisconnect.error, ', reconnecting:', shouldReconnect);
       connectionStatus = 'disconnected';
       
       if (shouldReconnect) {
         connectToWhatsApp();
       } else {
+        console.log('Connection logged out or unauthorized. Clearing corrupted session and restarting...');
         currentQR = null;
+        try {
+          const fs = require('fs');
+          fs.rmSync('auth_info_baileys', { recursive: true, force: true });
+        } catch (e) {
+          console.error('Failed to clear session folder:', e);
+        }
+        connectToWhatsApp();
       }
     } else if (connection === 'open') {
       console.log('WhatsApp connected successfully!');
@@ -68,11 +77,27 @@ async function sendMessage(phoneNumber, message) {
   
   // Verify if the number is registered on WhatsApp
   const [result] = await socket.onWhatsApp(jid);
+  console.log(`Checking WhatsApp registration for ${jid}:`, result);
+  
   if (!result || !result.exists) {
     throw new Error('Phone number is not registered on WhatsApp.');
   }
   
-  await socket.sendMessage(result.jid, { text: message });
+  console.log(`Attempting to send message to ${result.jid}...`);
+  
+  try {
+    // Simulate typing to prevent WhatsApp Business from silently dropping messages as spam
+    await socket.presenceSubscribe(result.jid);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await socket.sendPresenceUpdate('composing', result.jid);
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulating 1.5s typing
+    await socket.sendPresenceUpdate('paused', result.jid);
+  } catch (e) {
+    console.error('Error simulating typing presence:', e);
+  }
+
+  const sentMsg = await socket.sendMessage(result.jid, { text: message });
+  console.log('Message successfully dispatched to WhatsApp servers:', sentMsg?.key);
 }
 
 module.exports = {
