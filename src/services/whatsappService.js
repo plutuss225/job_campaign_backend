@@ -72,7 +72,7 @@ async function sendMessage(phoneNumber, message) {
     throw new Error('Phone number is not registered on WhatsApp.');
   }
   
-  await socket.sendMessage(jid, { text: message });
+  await socket.sendMessage(result.jid, { text: message });
 }
 
 module.exports = {
