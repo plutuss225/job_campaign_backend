@@ -66,6 +66,12 @@ async function sendMessage(phoneNumber, message) {
   
   const jid = `${formattedNumber}@s.whatsapp.net`;
   
+  // Verify if the number is registered on WhatsApp
+  const [result] = await socket.onWhatsApp(jid);
+  if (!result || !result.exists) {
+    throw new Error('Phone number is not registered on WhatsApp.');
+  }
+  
   await socket.sendMessage(jid, { text: message });
 }
 
