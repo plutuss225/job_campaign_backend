@@ -66,9 +66,15 @@ router.post('/', async (req, res) => {
   try {
     const data = req.body;
     
+    // Trim string values
+    const trimmedData = {};
+    for (const key in data) {
+      trimmedData[key] = typeof data[key] === 'string' ? data[key].trim() : data[key];
+    }
+    
     // Convert object to arrays for insertion
-    const keys = Object.keys(data);
-    const values = Object.values(data);
+    const keys = Object.keys(trimmedData);
+    const values = Object.values(trimmedData);
     
     if (keys.length === 0) {
       return res.status(400).json({ error: 'No data provided' });
@@ -187,19 +193,25 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
     
+    // Trim string values
+    const trimmedUpdateData = {};
+    for (const key in updateData) {
+      trimmedUpdateData[key] = typeof updateData[key] === 'string' ? updateData[key].trim() : updateData[key];
+    }
+    
     // Check if person exists
     const [existing] = await pool.query('SELECT * FROM Person WHERE id = ?', [id]);
     if (existing.length === 0) {
       return res.status(404).json({ error: 'Person not found' });
     }
 
-    const keys = Object.keys(updateData);
+    const keys = Object.keys(trimmedUpdateData);
     if (keys.length === 0) {
       return res.status(400).json({ error: 'No data provided to update' });
     }
 
     const setClause = keys.map(key => `${key} = ?`).join(', ');
-    const values = Object.values(updateData);
+    const values = Object.values(trimmedUpdateData);
     
     // Update updatedAt manually
     const query = `UPDATE Person SET ${setClause}, updatedAt = ? WHERE id = ?`;
