@@ -77,6 +77,14 @@ router.post('/', async (req, res) => {
       trimmedData.whatsappMessageSent = 1;
     }
 
+    // Check for existing contactNumber
+    if (trimmedData.contactNumber) {
+      const [existing] = await pool.query('SELECT id FROM Person WHERE contactNumber = ?', [trimmedData.contactNumber]);
+      if (existing.length > 0) {
+        return res.status(409).json({ error: 'This contact number is already registered.' });
+      }
+    }
+
     // Convert object to arrays for insertion
     const keys = Object.keys(trimmedData);
     const values = Object.values(trimmedData);
