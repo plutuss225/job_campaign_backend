@@ -72,6 +72,11 @@ router.post('/', async (req, res) => {
       trimmedData[key] = typeof data[key] === 'string' ? data[key].trim() : data[key];
     }
     
+    // Default whatsappMessageSent to 1 for new entries
+    if (trimmedData.whatsappMessageSent === undefined) {
+      trimmedData.whatsappMessageSent = 1;
+    }
+
     // Convert object to arrays for insertion
     const keys = Object.keys(trimmedData);
     const values = Object.values(trimmedData);
