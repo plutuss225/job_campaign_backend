@@ -270,4 +270,25 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// PATCH /api/persons/:id/call-status (Protected)
+router.patch('/:id/call-status', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { callStatus, callRemark } = req.body;
+    const [existing] = await pool.query('SELECT * FROM Person WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ error: 'Person not found' });
+    }
+    const trimmedStatus = callStatus ? String(callStatus).trim() : null;
+    const trimmedRemark = callRemark !== undefined ? String(callRemark).trim() : null;
+    const query = 'UPDATE Person SET callStatus = ?, callRemark = ?, updatedAt = ? WHERE id = ?';
+    await pool.query(query, [trimmedStatus, trimmedRemark, new Date(), id]);
+    const [updatedPerson] = await pool.query('SELECT * FROM Person WHERE id = ?', [id]);
+    res.status(200).json({ message: 'Call status updated successfully', person: updatedPerson[0] });
+  } catch (error) {
+    console.error('Error updating call status:', error);
+    res.status(500).json({ error: 'Failed to update call status' });
+  }
+});
+
 module.exports = router;
