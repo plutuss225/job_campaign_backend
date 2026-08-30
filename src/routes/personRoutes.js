@@ -63,6 +63,8 @@ const router = express.Router();
  */
 // POST /api/persons (Public)
 router.post('/', async (req, res) => {
+  return res.status(403).json({ error: 'सध्या नोंदणी बंद आहे.' });
+
   try {
     const data = req.body;
     
