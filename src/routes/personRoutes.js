@@ -208,10 +208,14 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
     
-    // Trim string values
+    // Trim string values and filter out restricted fields
     const trimmedUpdateData = {};
+    const restrictedFields = ['id', 'createdAt', 'updatedAt'];
+    
     for (const key in updateData) {
-      trimmedUpdateData[key] = typeof updateData[key] === 'string' ? updateData[key].trim() : updateData[key];
+      if (!restrictedFields.includes(key)) {
+        trimmedUpdateData[key] = typeof updateData[key] === 'string' ? updateData[key].trim() : updateData[key];
+      }
     }
     
     // Check if person exists
